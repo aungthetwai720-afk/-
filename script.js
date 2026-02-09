@@ -1,5 +1,4 @@
-const URL = "https://script.google.com/macros/s/AKfycbxpsWD6_qceaMO6mVYlPGthy1KVKOsLMFF6XF7tWGapfrP_MnsZAjsKy5OKCdNxZJyauA/exec";
-
+const URL = "https://script.google.com/macros/s/AKfycbxpsWD6_qceaMO6mVYlPGthy1KVKOsLMFF6XF7tWGapfrP_MnsZAjsKy5OKCdNxZJyauA/exec"; 
 
 let inventory = []; 
 let cart = {};
@@ -10,7 +9,9 @@ async function loadData() {
         inventory = await res.json();
         render();
     } catch (e) {
-        console.error(e);
+        console.error("Error loading data:", e);
+        const list = document.getElementById('itemList');
+        if (list) list.innerHTML = "ဒေတာဆွဲမရပါ၊ URL ကို စစ်ဆေးပါ။";
     }
 }
 
@@ -18,10 +19,11 @@ function render(data = inventory) {
     const list = document.getElementById('itemList');
     if (!list) return;
     list.innerHTML = data.map(i => `
-        <div class="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm border-l-4 border-blue-500 mb-2">
+        <div class="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm border border-gray-100 mb-2">
             <div>
                 <div class="font-bold">${i[1]}</div>
                 <div class="text-xs text-gray-500">${i[2]} | ${i[3]} K</div>
+                <div class="text-xs text-blue-500">လက်ကျန်: ${i[4]}</div>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="update('${i[0]}', -1, ${i[3]}, '${i[1]}')" class="bg-gray-200 px-3 py-1 rounded">-</button>
@@ -35,7 +37,7 @@ function render(data = inventory) {
 function update(id, ch, pr, nm) {
     if (!cart[id]) cart[id] = { qty: 0, price: pr, name: nm };
     cart[id].qty = Math.max(0, cart[id].qty + ch);
-    const qtyElem = document.getElementById(`q-${id}`);
+    const qtyElem = document.getElementById('q-' + id);
     if (qtyElem) qtyElem.innerText = cart[id].qty;
     let total = 0; 
     Object.values(cart).forEach(i => total += (i.qty * i.price));
@@ -51,25 +53,25 @@ async function checkout() {
     }));
 
     if (!selected.length) return alert("ပစ္စည်းရွေးပါ");
+    if (!seller || !buyer) return alert("အမည်များဖြည့်ပါ");
+
     btn.disabled = true; 
     btn.innerText = "သိမ်းဆည်းနေပါသည်...";
-
-    const rawTotal = Object.values(cart).reduce((t, i) => t + (i.qty * i.price), 0);
 
     try {
         await fetch(URL, {
             method: 'POST',
             body: JSON.stringify({
-                sellerName: seller || "မသိရ",
-                buyerName: buyer || "မသိရ",
-                totalAmount: rawTotal,
+                sellerName: seller,
+                buyerName: buyer,
+                totalAmount: Object.values(cart).reduce((t, i) => t + (i.qty * i.price), 0),
                 cart: selected
             })
         });
         alert("ရောင်းပြီးပါပြီ"); 
         location.reload();
     } catch (e) {
-        alert("အမှားရှိနေပါသည်");
+        alert("သိမ်းဆည်းရာတွင် အမှားရှိနေပါသည်");
         btn.disabled = false;
         btn.innerText = "ရောင်းမည်";
     }
