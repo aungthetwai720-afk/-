@@ -7,7 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 p-4">
-    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
         <h2 class="text-2xl font-bold text-blue-600 text-center mb-4">Inventory Sales</h2>
         
         <input type="text" id="search" oninput="searchItem()" placeholder="ရှာဖွေရန်..." class="w-full p-2 border rounded mb-4">
@@ -31,90 +31,6 @@
         </button>
     </div>
 
-    <script>
-        const URL = "https://script.google.com/macros/s/AKfycbxW1qefnDSUYrm2AxBg4pH56X2n1Mv4abzOoAkRBo3HF7NA51Y4yyTFeP1-S_dkUhxpdQ/exec"; 
-        let inventory = []; 
-        let cart = {};
-
-        async function loadData() {
-            try {
-                const res = await fetch(URL);
-                inventory = await res.json();
-                render();
-            } catch (e) {
-                console.error("Error loading data:", e);
-                document.getElementById('itemList').innerHTML = "ဒေတာဆွဲမရပါ၊ ခွင့်ပြုချက် (Permission) စစ်ပေးပါ။";
-            }
-        }
-
-        function render(data = inventory) {
-            const list = document.getElementById('itemList');
-            if (!list) return;
-            list.innerHTML = data.map(i => `
-                <div class="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm border border-gray-100 mb-2">
-                    <div>
-                        <div class="font-bold">${i[1]}</div>
-                        <div class="text-xs text-gray-500">${i[2]} | ${i[3]} K</div>
-                        <div class="text-xs text-blue-500">လက်ကျန်: ${i[4]}</div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button onclick="update('${i[0]}', -1, ${i[3]}, '${i[1]}')" class="bg-gray-200 px-3 py-1 rounded">-</button>
-                        <span id="q-${i[0]}" class="font-bold w-6 text-center">${cart[i[0]] ? cart[i[0]].qty : 0}</span>
-                        <button onclick="update('${i[0]}', 1, ${i[3]}, '${i[1]}')" class="bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold">+</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function update(id, ch, pr, nm) {
-            if (!cart[id]) cart[id] = { qty: 0, price: pr, name: nm };
-            cart[id].qty = Math.max(0, cart[id].qty + ch);
-            const qtyElem = document.getElementById('q-' + id);
-            if (qtyElem) qtyElem.innerText = cart[id].qty;
-            let total = 0; 
-            Object.values(cart).forEach(i => total += (i.qty * i.price));
-            document.getElementById('totalDisplay').innerText = total.toLocaleString() + " MMK";
-        }
-
-        async function checkout() {
-            const btn = document.getElementById('btn');
-            const seller = document.getElementById('seller').value;
-            const buyer = document.getElementById('buyer').value;
-            const selected = Object.keys(cart).filter(id => cart[id].qty > 0).map(id => ({
-                id: id, qty: cart[id].qty, name: cart[id].name, price: cart[id].price
-            }));
-
-            if (!selected.length) return alert("ပစ္စည်းရွေးပါ");
-            if (!seller || !buyer) return alert("အမည်များဖြည့်ပါ");
-
-            btn.disabled = true; 
-            btn.innerText = "သိမ်းဆည်းနေပါသည်...";
-
-            try {
-                await fetch(URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        sellerName: seller,
-                        buyerName: buyer,
-                        totalAmount: Object.values(cart).reduce((t, i) => t + (i.qty * i.price), 0),
-                        cart: selected
-                    })
-                });
-                alert("ရောင်းပြီးပါပြီ"); 
-                location.reload();
-            } catch (e) {
-                alert("အမှားရှိနေပါသည်");
-                btn.disabled = false;
-                btn.innerText = "ရောင်းမည်";
-            }
-        }
-
-        function searchItem() {
-            let val = document.getElementById('search').value.toLowerCase();
-            render(inventory.filter(i => i[1].toLowerCase().includes(val)));
-        }
-
-        loadData();
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
