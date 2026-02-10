@@ -1,34 +1,41 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>POS System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>စိုက်ပျိုးရေးဆေးဆိုင် Sales Entry</title>
+<link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-100 p-4">
-    <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
-        <h2 class="text-2xl font-bold text-blue-600 text-center mb-6">အရောင်းစာရင်း</h2>
-        
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <input type="text" id="seller" placeholder="ရောင်းသူအမည်" class="p-2 border rounded-lg text-sm focus:outline-blue-500">
-            <input type="text" id="buyer" placeholder="ဝယ်သူအမည်" class="p-2 border rounded-lg text-sm focus:outline-blue-500">
-        </div>
+<body>
+<div class="container">
+  <h1>Sales Entry</h1>
+  <form id="salesForm">
+    <label>အရောင်းတာဝန်ခံ</label>
+    <input type="text" id="salesPerson" required>
 
-        <div id="itemList" class="space-y-3 h-[400px] overflow-y-auto mb-6 border-b pb-4">
-            <p class="text-center text-gray-400 mt-20">ဒေတာဆွဲနေပါသည်...</p>
-        </div>
+    <label>ဝယ်သူ</label>
+    <input type="text" id="customer">
 
-        <div class="flex justify-between items-center mb-6">
-            <span class="font-bold text-lg text-gray-700">စုစုပေါင်း:</span>
-            <span id="totalDisplay" class="font-bold text-xl text-blue-600">0 MMK</span>
-        </div>
+    <label>ပစ္စည်း</label>
+    <select id="product" required></select>
 
-        <button id="btn" onclick="checkout()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition duration-200 active:scale-95">
-            ရောင်းမည်
-        </button>
-    </div>
-    <script src="script.js"></script>
+    <label>ထုပ်ပိုးပုံ</label>
+    <input type="text" id="package" readonly>
+
+    <label>ဈေးနှုန်း</label>
+    <input type="number" id="price" readonly>
+
+    <label>အရေအတွက်</label>
+    <input type="number" id="qty" min="1" required>
+
+    <label>စုစုပေါင်း</label>
+    <input type="number" id="total" readonly>
+
+    <button type="submit">Save Sale</button>
+  </form>
+
+  <div id="msg"></div>
+</div>
+
+<script src="app.js"></script>
 </body>
 </html>
