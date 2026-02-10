@@ -15,23 +15,41 @@
     <label>ဝယ်သူ</label>
     <input type="text" id="customer">
 
-    <label>ပစ္စည်း</label>
-    <select id="product" required></select>
-
+    <label>ပစ္စည်း ရှာရန်</label>
+    <input type="text" id="productSearch" placeholder="Type product name..." autocomplete="off">
+    
     <label>ထုပ်ပိုးပုံ</label>
-    <input type="text" id="package" readonly>
+    <select id="packageSelect"></select>
 
     <label>ဈေးနှုန်း</label>
     <input type="number" id="price" readonly>
 
     <label>အရေအတွက်</label>
-    <input type="number" id="qty" min="1" required>
+    <input type="number" id="qty" min="1">
 
     <label>စုစုပေါင်း</label>
-    <input type="number" id="total" readonly>
+    <input type="number" id="lineTotal" readonly>
 
-    <button type="submit">Save Sale</button>
+    <button type="button" id="addProductBtn">Add Product</button>
   </form>
+
+  <h2>Current Sale</h2>
+  <table id="saleTable">
+    <thead>
+      <tr>
+        <th>ပစ္စည်း</th>
+        <th>ထုပ်ပိုးပုံ</th>
+        <th>ဈေး</th>
+        <th>အရေအတွက်</th>
+        <th>စုစုပေါင်း</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <p>Grand Total: <span id="grandTotal">0</span></p>
+  <button id="saveSaleBtn">Save Sale</button>
 
   <div id="msg"></div>
 </div>
