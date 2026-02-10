@@ -8,7 +8,7 @@ async function loadData() {
         const res = await fetch(URL);
         inventory = await res.json();
         render();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Load Error:", e); }
 }
 
 function render(data = inventory) {
@@ -16,7 +16,7 @@ function render(data = inventory) {
     if (!list) return;
     list.innerHTML = data.map(i => {
         const currentInCart = cart[i[0]] ? cart[i[0]].qty : 0;
-        const stockLeft = i[4] - currentInCart; // လက်ကျန်တွက်ချက်မှု
+        const stockLeft = i[4] - currentInCart;
 
         return `
         <div class="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm border border-gray-100 mb-2">
@@ -31,8 +31,8 @@ function render(data = inventory) {
                 <button onclick="update('${i[0]}', -1, ${i[3]}, '${i[1]}')" class="bg-gray-200 px-3 py-1 rounded">-</button>
                 <span id="q-${i[0]}" class="font-bold w-6 text-center text-sm">${currentInCart}</span>
                 <button onclick="update('${i[0]}', 1, ${i[3]}, '${i[1]}')" 
-                    class="bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold ${stockLeft <= 0 ? 'opacity-50 cursor-not-allowed' : ''}"
-                    ${stockLeft <= 0 ? 'disabled' : ''}>+</button>
+                    class="bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold"
+                    ${stockLeft <= 0 ? 'disabled style="opacity:0.5"' : ''}>+</button>
             </div>
         </div>`;
     }).join('');
@@ -42,14 +42,10 @@ function update(id, ch, pr, nm) {
     const item = inventory.find(i => i[0] == id);
     if (!cart[id]) cart[id] = { qty: 0, price: pr, name: nm };
     
-    // လက်ကျန်ထက် ပိုမရောင်းရအောင် တားဆီးခြင်း
-    if (ch > 0 && cart[id].qty >= item[4]) {
-        alert("လက်ကျန်မရှိတော့ပါ");
-        return;
-    }
+    if (ch > 0 && cart[id].qty >= item[4]) return alert("လက်ကျန်မရှိတော့ပါ");
 
     cart[id].qty = Math.max(0, cart[id].qty + ch);
-    render(); // အရေအတွက်ပြောင်းရင် list ကိုပါ refresh လုပ်ပြီး + ခလုတ်ကို ပိတ်/ဖွင့်လုပ်မယ်
+    render(); 
 
     let total = 0; 
     Object.values(cart).forEach(i => total += (i.qty * i.price));
@@ -61,22 +57,22 @@ async function checkout() {
     const buyer = document.getElementById('buyer').value;
     const selected = Object.keys(cart).filter(id => cart[id].qty > 0).map(id => cart[id]);
 
-    if (!selected.length || !seller || !buyer) return alert("အမည်နှင့် ပစ္စည်းများ ပြည့်စုံစွာရွေးချယ်ပါ");
+    if (!selected.length || !seller || !buyer) return alert("အချက်အလက်ပြည့်စုံစွာဖြည့်ပါ");
 
     const btn = document.getElementById('btn');
-    btn.disabled = true; btn.innerText = "ခေတ္တစောင့်ပါ...";
+    btn.disabled = true; 
+    btn.innerText = "ခေတ္တစောင့်ပါ...";
 
     try {
-        // mode: 'no-cors' ကိုသုံးရင် response ဖတ်လို့မရလို့ ဖြုတ်ထားရပါမယ်
-        await fetch(URL, {
+        // mode: 'no-cors' မသုံးဘဲ ပုံမှန်ပဲပို့ပါ
+        fetch(URL, {
             method: 'POST',
             body: JSON.stringify({ sellerName: seller, buyerName: buyer, cart: selected })
         });
         
-        // Sheet ထဲရောက်သွားရင် ဘောင်ချာတန်းပြမယ်
+        // အောင်မြင်သည်ဖြစ်စေ၊ မရသည်ဖြစ်စေ ဘောင်ချာတန်းပြမယ်
         showReceipt(seller, buyer, selected);
     } catch (e) {
-        // Replit/Vercel error တက်ရင်တောင် Sheet ထဲစာရင်းဝင်ရင် ဘောင်ချာပြပေးလိုက်မယ်
         showReceipt(seller, buyer, selected);
     }
 }
@@ -95,9 +91,13 @@ function showReceipt(seller, buyer, items) {
 }
 
 function downloadReceipt() {
-    html2canvas(document.querySelector("#receiptCapture"), { scale: 3 }).then(canvas => {
-        let link = document.createElement('a');
-        link.download = 'Receipt-' + Date.now() + '.png';
+    const receipt = document.getElementById('receiptCapture');
+    html2canvas(receipt, {
+        useCORS: true,
+        scale: 2
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = `Receipt_${Date.now()}.png`;
         link.href = canvas.toDataURL("image/png");
         link.click();
     });
