@@ -3,6 +3,7 @@ body {
   background-color: #f0f8ff;
   padding: 20px;
 }
+
 .container {
   max-width: 500px;
   margin: auto;
@@ -11,9 +12,42 @@ body {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-h1 { text-align: center; color: #2c7be5; }
-form label { display: block; margin-top: 10px; }
-form input, form select { width: 100%; padding: 8px; margin-top: 5px; }
-button { margin-top: 15px; padding: 10px; width: 100%; background: #2c7be5; color: #fff; border: none; cursor: pointer; border-radius: 5px; }
-button:hover { background: #1a5bb8; }
-#msg { margin-top: 10px; text-align: center; font-weight: bold; }
+
+h1 {
+  text-align: center;
+  color: #2c7be5;
+}
+
+form label {
+  display: block;
+  margin-top: 10px;
+}
+
+form input,
+form select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  width: 100%;
+  background: #2c7be5;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:hover {
+  background: #1a5bb8;
+}
+
+#msg {
+  margin-top: 10px;
+  text-align: center;
+  font-weight: bold;
+}
