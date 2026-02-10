@@ -3,60 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Sales & Receipt</title>
+    <title>POS System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-100 p-4">
-    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
-        <h2 class="text-2xl font-bold text-blue-600 text-center mb-4">Inventory Sales</h2>
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-6">
+        <h2 class="text-2xl font-bold text-blue-600 text-center mb-6">အရောင်းစာရင်း</h2>
         
-        <input type="text" id="search" oninput="searchItem()" placeholder="ရှာဖွေရန်..." class="w-full p-2 border rounded mb-4">
-        
-        <div class="grid grid-cols-2 gap-2 mb-4">
-            <input type="text" id="seller" placeholder="ရောင်းသူအမည်" class="p-2 border rounded text-sm">
-            <input type="text" id="buyer" placeholder="ဝယ်သူအမည်" class="p-2 border rounded text-sm">
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <input type="text" id="seller" placeholder="ရောင်းသူအမည်" class="p-2 border rounded-lg text-sm focus:outline-blue-500">
+            <input type="text" id="buyer" placeholder="ဝယ်သူအမည်" class="p-2 border rounded-lg text-sm focus:outline-blue-500">
         </div>
 
-        <div id="itemList" class="space-y-2 h-80 overflow-y-auto mb-4 border-b pb-2">
-            <p class="text-center text-gray-400 mt-10">ဒေတာဆွဲနေပါသည်...</p>
+        <div id="itemList" class="space-y-3 h-[400px] overflow-y-auto mb-6 border-b pb-4">
+            <p class="text-center text-gray-400 mt-20">ဒေတာဆွဲနေပါသည်...</p>
         </div>
 
-        <div class="text-right mb-4">
-            <span class="font-bold text-lg">Total: </span>
-            <span id="totalDisplay" class="font-bold text-lg text-blue-600">0 MMK</span>
+        <div class="flex justify-between items-center mb-6">
+            <span class="font-bold text-lg text-gray-700">စုစုပေါင်း:</span>
+            <span id="totalDisplay" class="font-bold text-xl text-blue-600">0 MMK</span>
         </div>
 
-        <button id="btn" onclick="checkout()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
+        <button id="btn" onclick="checkout()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition duration-200 active:scale-95">
             ရောင်းမည်
         </button>
     </div>
-
-    <div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white p-4 rounded-lg w-full max-w-sm">
-            <div id="receiptCapture" class="p-4 border bg-white">
-                <h3 class="text-center font-bold text-xl border-b pb-2 mb-2">အရောင်းပြေစာ</h3>
-                <div class="text-sm space-y-1 mb-3">
-                    <p>ရောင်းသူ: <span id="r-seller"></span></p>
-                    <p>ဝယ်သူ: <span id="r-buyer"></span></p>
-                    <p>နေ့စွဲ: <span id="r-date"></span></p>
-                </div>
-                <table class="w-full text-sm border-t border-b py-2 mb-2 text-left">
-                    <thead><tr><th>ပစ္စည်း</th><th>ခု</th><th>ဈေး</th></tr></thead>
-                    <tbody id="r-items"></tbody>
-                </table>
-                <div class="text-right font-bold text-lg">
-                    စုစုပေါင်း: <span id="r-total"></span> MMK
-                </div>
-                <p class="text-center text-xs mt-4">ကျေးဇူးတင်ပါသည်</p>
-            </div>
-            <div class="flex gap-2 mt-4">
-                <button onclick="downloadReceipt()" class="flex-1 bg-green-600 text-white py-2 rounded">ပုံသိမ်းမည်</button>
-                <button onclick="location.reload()" class="flex-1 bg-gray-400 text-white py-2 rounded">ပိတ်မည်</button>
-            </div>
-        </div>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
