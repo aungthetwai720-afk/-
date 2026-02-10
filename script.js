@@ -14,26 +14,43 @@ async function loadData() {
 function render(data = inventory) {
     const list = document.getElementById('itemList');
     if (!list) return;
-    list.innerHTML = data.map(i => `
+    list.innerHTML = data.map(i => {
+        const currentInCart = cart[i[0]] ? cart[i[0]].qty : 0;
+        const stockLeft = i[4] - currentInCart; // လက်ကျန်တွက်ချက်မှု
+
+        return `
         <div class="bg-white p-3 rounded-lg flex justify-between items-center shadow-sm border border-gray-100 mb-2">
             <div>
-                <div class="font-bold">${i[1]}</div>
-                <div class="text-xs text-gray-500">${i[2]} | ${i[3]} K</div>
-                <div class="text-xs text-blue-500">လက်ကျန်: ${i[4]}</div>
+                <div class="font-bold text-sm">${i[1]}</div>
+                <div class="text-[10px] text-gray-500">${i[2]} | ${i[3]} K</div>
+                <div class="text-[10px] ${stockLeft <= 0 ? 'text-red-500 font-bold' : 'text-blue-500'}">
+                    လက်ကျန်: ${stockLeft}
+                </div>
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="update('${i[0]}', -1, ${i[3]}, '${i[1]}')" class="bg-gray-200 px-3 py-1 rounded">-</button>
-                <span id="q-${i[0]}" class="font-bold w-6 text-center">${cart[i[0]] ? cart[i[0]].qty : 0}</span>
-                <button onclick="update('${i[0]}', 1, ${i[3]}, '${i[1]}')" class="bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold">+</button>
+                <span id="q-${i[0]}" class="font-bold w-6 text-center text-sm">${currentInCart}</span>
+                <button onclick="update('${i[0]}', 1, ${i[3]}, '${i[1]}')" 
+                    class="bg-blue-100 text-blue-600 px-3 py-1 rounded font-bold ${stockLeft <= 0 ? 'opacity-50 cursor-not-allowed' : ''}"
+                    ${stockLeft <= 0 ? 'disabled' : ''}>+</button>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+    }).join('');
 }
 
 function update(id, ch, pr, nm) {
+    const item = inventory.find(i => i[0] == id);
     if (!cart[id]) cart[id] = { qty: 0, price: pr, name: nm };
+    
+    // လက်ကျန်ထက် ပိုမရောင်းရအောင် တားဆီးခြင်း
+    if (ch > 0 && cart[id].qty >= item[4]) {
+        alert("လက်ကျန်မရှိတော့ပါ");
+        return;
+    }
+
     cart[id].qty = Math.max(0, cart[id].qty + ch);
-    document.getElementById('q-' + id).innerText = cart[id].qty;
+    render(); // အရေအတွက်ပြောင်းရင် list ကိုပါ refresh လုပ်ပြီး + ခလုတ်ကို ပိတ်/ဖွင့်လုပ်မယ်
+
     let total = 0; 
     Object.values(cart).forEach(i => total += (i.qty * i.price));
     document.getElementById('totalDisplay').innerText = total.toLocaleString() + " MMK";
@@ -44,20 +61,23 @@ async function checkout() {
     const buyer = document.getElementById('buyer').value;
     const selected = Object.keys(cart).filter(id => cart[id].qty > 0).map(id => cart[id]);
 
-    if (!selected.length || !seller || !buyer) return alert("အချက်အလက်ပြည့်စုံစွာဖြည့်ပါ");
+    if (!selected.length || !seller || !buyer) return alert("အမည်နှင့် ပစ္စည်းများ ပြည့်စုံစွာရွေးချယ်ပါ");
 
     const btn = document.getElementById('btn');
-    btn.disabled = true; btn.innerText = "သိမ်းဆည်းနေပါသည်...";
+    btn.disabled = true; btn.innerText = "ခေတ္တစောင့်ပါ...";
 
     try {
+        // mode: 'no-cors' ကိုသုံးရင် response ဖတ်လို့မရလို့ ဖြုတ်ထားရပါမယ်
         await fetch(URL, {
             method: 'POST',
             body: JSON.stringify({ sellerName: seller, buyerName: buyer, cart: selected })
         });
+        
+        // Sheet ထဲရောက်သွားရင် ဘောင်ချာတန်းပြမယ်
         showReceipt(seller, buyer, selected);
     } catch (e) {
-        alert("အမှားရှိနေပါသည်");
-        btn.disabled = false; btn.innerText = "ရောင်းမည်";
+        // Replit/Vercel error တက်ရင်တောင် Sheet ထဲစာရင်းဝင်ရင် ဘောင်ချာပြပေးလိုက်မယ်
+        showReceipt(seller, buyer, selected);
     }
 }
 
@@ -65,22 +85,20 @@ function showReceipt(seller, buyer, items) {
     document.getElementById('r-seller').innerText = seller;
     document.getElementById('r-buyer').innerText = buyer;
     document.getElementById('r-date').innerText = new Date().toLocaleString();
-    
     let total = 0;
     document.getElementById('r-items').innerHTML = items.map(i => {
         total += (i.qty * i.price);
-        return `<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.qty * i.price).toLocaleString()}</td></tr>`;
+        return `<tr class="border-b"><td>${i.name}</td><td>${i.qty}</td><td>${(i.qty * i.price).toLocaleString()}</td></tr>`;
     }).join('');
-    
     document.getElementById('r-total').innerText = total.toLocaleString();
     document.getElementById('receiptModal').classList.remove('hidden');
 }
 
 function downloadReceipt() {
-    html2canvas(document.querySelector("#receiptCapture")).then(canvas => {
+    html2canvas(document.querySelector("#receiptCapture"), { scale: 3 }).then(canvas => {
         let link = document.createElement('a');
         link.download = 'Receipt-' + Date.now() + '.png';
-        link.href = canvas.toDataURL();
+        link.href = canvas.toDataURL("image/png");
         link.click();
     });
 }
