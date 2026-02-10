@@ -8,11 +8,7 @@ async function loadData() {
         const res = await fetch(URL);
         inventory = await res.json();
         render();
-    } catch (e) {
-        console.error("Error loading data:", e);
-        const list = document.getElementById('itemList');
-        if (list) list.innerHTML = "ဒေတာဆွဲမရပါ၊ URL ကို စစ်ဆေးပါ။";
-    }
+    } catch (e) { console.error(e); }
 }
 
 function render(data = inventory) {
@@ -37,44 +33,56 @@ function render(data = inventory) {
 function update(id, ch, pr, nm) {
     if (!cart[id]) cart[id] = { qty: 0, price: pr, name: nm };
     cart[id].qty = Math.max(0, cart[id].qty + ch);
-    const qtyElem = document.getElementById('q-' + id);
-    if (qtyElem) qtyElem.innerText = cart[id].qty;
+    document.getElementById('q-' + id).innerText = cart[id].qty;
     let total = 0; 
     Object.values(cart).forEach(i => total += (i.qty * i.price));
     document.getElementById('totalDisplay').innerText = total.toLocaleString() + " MMK";
 }
 
 async function checkout() {
-    const btn = document.getElementById('btn');
     const seller = document.getElementById('seller').value;
     const buyer = document.getElementById('buyer').value;
-    const selected = Object.keys(cart).filter(id => cart[id].qty > 0).map(id => ({
-        id: id, qty: cart[id].qty, name: cart[id].name, price: cart[id].price
-    }));
+    const selected = Object.keys(cart).filter(id => cart[id].qty > 0).map(id => cart[id]);
 
-    if (!selected.length) return alert("ပစ္စည်းရွေးပါ");
-    if (!seller || !buyer) return alert("အမည်များဖြည့်ပါ");
+    if (!selected.length || !seller || !buyer) return alert("အချက်အလက်ပြည့်စုံစွာဖြည့်ပါ");
 
-    btn.disabled = true; 
-    btn.innerText = "သိမ်းဆည်းနေပါသည်...";
+    const btn = document.getElementById('btn');
+    btn.disabled = true; btn.innerText = "သိမ်းဆည်းနေပါသည်...";
 
     try {
         await fetch(URL, {
             method: 'POST',
-            body: JSON.stringify({
-                sellerName: seller,
-                buyerName: buyer,
-                totalAmount: Object.values(cart).reduce((t, i) => t + (i.qty * i.price), 0),
-                cart: selected
-            })
+            body: JSON.stringify({ sellerName: seller, buyerName: buyer, cart: selected })
         });
-        alert("ရောင်းပြီးပါပြီ"); 
-        location.reload();
+        showReceipt(seller, buyer, selected);
     } catch (e) {
-        alert("သိမ်းဆည်းရာတွင် အမှားရှိနေပါသည်");
-        btn.disabled = false;
-        btn.innerText = "ရောင်းမည်";
+        alert("အမှားရှိနေပါသည်");
+        btn.disabled = false; btn.innerText = "ရောင်းမည်";
     }
+}
+
+function showReceipt(seller, buyer, items) {
+    document.getElementById('r-seller').innerText = seller;
+    document.getElementById('r-buyer').innerText = buyer;
+    document.getElementById('r-date').innerText = new Date().toLocaleString();
+    
+    let total = 0;
+    document.getElementById('r-items').innerHTML = items.map(i => {
+        total += (i.qty * i.price);
+        return `<tr><td>${i.name}</td><td>${i.qty}</td><td>${(i.qty * i.price).toLocaleString()}</td></tr>`;
+    }).join('');
+    
+    document.getElementById('r-total').innerText = total.toLocaleString();
+    document.getElementById('receiptModal').classList.remove('hidden');
+}
+
+function downloadReceipt() {
+    html2canvas(document.querySelector("#receiptCapture")).then(canvas => {
+        let link = document.createElement('a');
+        link.download = 'Receipt-' + Date.now() + '.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
 }
 
 function searchItem() {
