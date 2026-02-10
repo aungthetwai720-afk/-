@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventory Sales</title>
+    <title>Inventory Sales & Receipt</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="bg-gray-100 p-4">
     <div class="max-w-md mx-auto bg-white rounded-xl shadow-md p-6">
@@ -29,6 +30,31 @@
         <button id="btn" onclick="checkout()" class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">
             ရောင်းမည်
         </button>
+    </div>
+
+    <div id="receiptModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white p-4 rounded-lg w-full max-w-sm">
+            <div id="receiptCapture" class="p-4 border bg-white">
+                <h3 class="text-center font-bold text-xl border-b pb-2 mb-2">အရောင်းပြေစာ</h3>
+                <div class="text-sm space-y-1 mb-3">
+                    <p>ရောင်းသူ: <span id="r-seller"></span></p>
+                    <p>ဝယ်သူ: <span id="r-buyer"></span></p>
+                    <p>နေ့စွဲ: <span id="r-date"></span></p>
+                </div>
+                <table class="w-full text-sm border-t border-b py-2 mb-2 text-left">
+                    <thead><tr><th>ပစ္စည်း</th><th>ခု</th><th>ဈေး</th></tr></thead>
+                    <tbody id="r-items"></tbody>
+                </table>
+                <div class="text-right font-bold text-lg">
+                    စုစုပေါင်း: <span id="r-total"></span> MMK
+                </div>
+                <p class="text-center text-xs mt-4">ကျေးဇူးတင်ပါသည်</p>
+            </div>
+            <div class="flex gap-2 mt-4">
+                <button onclick="downloadReceipt()" class="flex-1 bg-green-600 text-white py-2 rounded">ပုံသိမ်းမည်</button>
+                <button onclick="location.reload()" class="flex-1 bg-gray-400 text-white py-2 rounded">ပိတ်မည်</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
