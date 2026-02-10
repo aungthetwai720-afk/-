@@ -1,0 +1,14 @@
+#itemList::-webkit-scrollbar {
+    width: 6px;
+}
+#itemList::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 10px;
+}
+.item-card {
+    border-left: 5px solid #2563eb;
+    transition: transform 0.1s ease-in-out;
+}
+.item-card:active {
+    transform: scale(0.98);
+}
