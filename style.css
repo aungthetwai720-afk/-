@@ -5,7 +5,7 @@ body {
 }
 
 .container {
-  max-width: 500px;
+  max-width: 600px;
   margin: auto;
   background: #fff;
   padding: 20px;
@@ -13,7 +13,7 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-h1 {
+h1, h2 {
   text-align: center;
   color: #2c7be5;
 }
@@ -23,8 +23,7 @@ form label {
   margin-top: 10px;
 }
 
-form input,
-form select {
+form input, form select {
   width: 100%;
   padding: 8px;
   margin-top: 5px;
@@ -32,7 +31,7 @@ form select {
 }
 
 button {
-  margin-top: 15px;
+  margin-top: 10px;
   padding: 10px;
   width: 100%;
   background: #2c7be5;
@@ -44,6 +43,21 @@ button {
 
 button:hover {
   background: #1a5bb8;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
 }
 
 #msg {
